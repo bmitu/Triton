@@ -1,15 +1,33 @@
 # Triton Performance Analyzer
 
+## Start Triton server for performance analysis
+
+cd active_models
+
+sudo docker run -it --gpus=all --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/home/ubuntu/Triton/active_models:/models nvcr.io/nvidia/tritonserver:22.12-py3
+tritonserver --model-repository=/models --model-control-mode explicit --load-model abinet
+
+- abinet
+- panet_ctw
+- yolox_x
+
+## Performance analysis
+
+References:
+
 - https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/perf_analyzer.html
 - https://github.com/triton-inference-server/server/blob/main/docs/user_guide/perf_analyzer.md
 
 
-sudo docker run -it --gpus=1 --net=host nvcr.io/nvidia/tritonserver:22.12-py3-sdk
-
+sudo docker run -it --gpus=0 --net=host nvcr.io/nvidia/tritonserver:22.12-py3-sdk
+perf_analyzer -m yolox_x --concurrency-range 2:2 --collect-metrics --verbose-csv -f perf32.csv
 Inside triton client docker container:
 
-perf_analyzer -m yolox_x32 --concurrency-range 2:2 --collect-metrics --verbose-csv -f perf32.csv
+perf_analyzer -m abinet --concurrency-range 2:2 --collect-metrics --verbose-csv -f perf32.csv
 
+perf_analyzer -m panet_ctw --concurrency-range 2 --collect-metrics --verbose-csv -f perf32.csv
+
+perf_analyzer -m yolox_x --concurrency-range 2:2 --collect-metrics --verbose-csv -f perf32.csv
 
 
 

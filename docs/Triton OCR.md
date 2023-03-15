@@ -1,17 +1,20 @@
+# Triton OCR
+
+https://github.com/triton-inference-server/server
+
+## Start Triton server for OCR
 
 ```
-cd server/docs/examples/model_repository/
+cd ~/Triton/active_models
+
+sudo docker run -it --gpus=all --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/home/ubuntu/Triton/ocr_models:/models nvcr.io/nvidia/tritonserver:22.12-py3
+
+tritonserver --model-repository=/models
 
 ```
 
-## Start Triton server
+sudo docker run -it --gpus=all --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/home/ubuntu/Triton/truck_models:/models nvcr.io/nvidia/tritonserver:22.12-py3
 
-```
-sudo docker run -it --gpus=all --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/home/ubuntu/server/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:22.12-py3
-
-tritonserver --model-repository=/models --model-control-mode explicit --load-model panet_ctw16
-
-```
 
 ## Convert model to TensorRT
 
@@ -19,8 +22,8 @@ tritonserver --model-repository=/models --model-control-mode explicit --load-mod
 sudo docker run --rm --gpus=all -v${PWD}:/models nvcr.io/nvidia/tensorrt:22.12-py3 \
 trtexec \
 --workspace=10000 \
---onnx=/models/panet_ctw.onnx \
---saveEngine=/models/panet_ctw32/1/model.plan
+--onnx=/models/6/panet_ctw.onnx \
+--saveEngine=/models/panet_ctw32/panet_ctw32-FP32.plan
 
 ```
 
@@ -243,3 +246,92 @@ Concurrency: 5, throughput: 83.5429 infer/sec, latency 59798 usec
 Concurrency: 7, throughput: 83.649 infer/sec, latency 83612 usec
 root@ip-172-31-82-208:/workspace# perf_analyzer -m abinet32 --concurrency-range 1:8:2 --collect-metrics --verbose-csv
 
+## ABINet best-train-abinet_github-789743c ONNX FP32
+
+throughput: 124 infer/sec
+
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+With models that actually work :)
+
+## panet_ctw-FP32.onnx
+
+root@ip-172-31-82-208:/workspace# perf_analyzer -m panet_ctw --concurrency-range 2:6 --collect-metrics --verbose-csv
+*** Measurement Settings ***
+  Batch size: 1
+  Service Kind: Triton
+  Using "time_windows" mode for stabilization
+  Measurement window: 5000 msec
+  Latency limit: 0 msec
+  Concurrency limit: 6 concurrent requests
+  Using synchronous calls for inference
+  Stabilizing using average latency
+
+Request concurrency: 2
+  Client: 
+    Request count: 872
+    Throughput: 48.4339 infer/sec
+    Avg latency: 41281 usec (standard deviation 937 usec)
+    p50 latency: 40881 usec
+    p90 latency: 42754 usec
+    p95 latency: 43143 usec
+    p99 latency: 43572 usec
+    Avg HTTP time: 41273 usec (send/recv 4757 usec + response wait 36516 usec)
+  Server: 
+    Inference count: 872
+    Execution count: 872
+    Successful request count: 872
+    Avg request latency: 28708 usec (overhead 26 usec + queue 8081 usec + compute input 2290 usec + compute infer 18111 usec + compute output 198 usec)
+
+  Server Prometheus Metrics: 
+    Avg GPU Utilization:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 92.8421%
+    Avg GPU Power Usage:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 69.4942 watts
+    Max GPU Memory Usage:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 2264924160 bytes
+    Total GPU Memory:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 16106127360 bytes
+
+## panet_ctw-FP32.plan
+
+root@ip-172-31-82-208:/workspace# perf_analyzer -m panet_ctw --concurrency-range 2:6 --collect-metrics --verbose-csv
+*** Measurement Settings ***
+  Batch size: 1
+  Service Kind: Triton
+  Using "time_windows" mode for stabilization
+  Measurement window: 5000 msec
+  Latency limit: 0 msec
+  Concurrency limit: 6 concurrent requests
+  Using synchronous calls for inference
+  Stabilizing using average latency
+
+Request concurrency: 2
+  Client: 
+    Request count: 1099
+    Throughput: 61.0307 infer/sec
+    Avg latency: 32768 usec (standard deviation 1834 usec)
+    p50 latency: 32343 usec
+    p90 latency: 33447 usec
+    p95 latency: 35498 usec
+    p99 latency: 41269 usec
+    Avg HTTP time: 32761 usec (send/recv 4536 usec + response wait 28225 usec)
+  Server: 
+    Inference count: 1099
+    Execution count: 1099
+    Successful request count: 1099
+    Avg request latency: 21741 usec (overhead 30 usec + queue 35 usec + compute input 5337 usec + compute infer 16021 usec + compute output 317 usec)
+
+  Server Prometheus Metrics: 
+    Avg GPU Utilization:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 94.4211%
+    Avg GPU Power Usage:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 69.1321 watts
+    Max GPU Memory Usage:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 1983905792 bytes
+    Total GPU Memory:
+      GPU-182f7da8-ee5a-997c-0920-556df28efe7c : 16106127360 bytes
+  

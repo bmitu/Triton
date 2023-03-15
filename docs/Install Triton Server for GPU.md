@@ -119,10 +119,11 @@ sudo apt install awscli
 
 
 
------
+------------------------------------------------------------
+
+
 
 sudo docker run -it --gpus=1 --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/home/ubuntu/ocr/models:/models nvcr.io/nvidia/tritonserver:22.12-py3 tritonserver --model-repository=/models
-
 
 
 ----

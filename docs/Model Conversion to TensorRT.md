@@ -44,3 +44,9 @@ trtexec \
 --workspace=10000 \
 --onnx=/models/panet_ctw.onnx \
 --saveEngine=/models/triton/panet_ctw/1/model.plan
+
+
+trtexec \
+--workspace=10000 \
+--onnx=/models/abinet.onnx \
+--saveEngine=/models/abinet.plan
